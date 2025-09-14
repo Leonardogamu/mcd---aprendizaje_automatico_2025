@@ -8,6 +8,6 @@ Este repositorio se elaboro para la materia de Aprendizaje Automatico, de la Mae
 
 **Tareas elaboradas por el alumno Leonardo Garcia Muñoz:**
 
--[Tarea 1](/Tarea_1.ipynb)
+- [Tarea 1](/Tarea_1.ipynb)
 
  *La lista se ira actualizando conforme se realicen el resto de tareas*
