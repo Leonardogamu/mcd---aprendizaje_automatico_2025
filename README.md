@@ -12,6 +12,6 @@ Este repositorio se elaboro para la materia de Aprendizaje Automatico, de la Mae
 - [Tarea 2](/Tarea_2.ipynb)
 - [Tarea 3](/Tarea_3.ipynb)
 - [Tarea 4](/Tarea_4.ipynb)
-- [Tarea 5]([/Tarea_5.ipynb](https://github.com/Leonardogamu/mcd---aprendizaje_automatico_2025/blob/main/Tarea%205/Tarea_5.ipynb))
+- [Tarea 5](https://github.com/Leonardogamu/mcd---aprendizaje_automatico_2025/blob/main/Tarea%205/Tarea_5.ipynb)
   
  *La lista se ira actualizando conforme se realicen el resto de tareas*
