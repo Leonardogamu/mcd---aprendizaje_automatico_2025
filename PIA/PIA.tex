@@ -1,0 +1,465 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[TJSASS]{tjsass} 
+\usepackage{tabularx}
+\usepackage{etoolbox}
+\makeatletter
+% Parchea el comando \@maketitle dentro de tjsass para borrar solo "Key Words:"
+\patchcmd{\@maketitle}{Key Words:}{}{}{}
+\makeatother
+\usepackage{graphicx} % Required for inserting images
+\usepackage[square,numbers]{natbib}
+
+\usepackage[spanish]{babel}
+\usepackage{float} % en el preámbulo
+\usepackage[labelfont=bf,labelsep=space]{caption}
+\RequirePackage{multicol}
+\RequirePackage{amsmath}
+\RequirePackage[varg]{txfonts}
+\RequirePackage{bm}
+\RequirePackage{array}
+\RequirePackage{color}
+\RequirePackage[hang]{footmisc}
+\RequirePackage{tjsasscite}
+\RequirePackage{xurl}
+
+
+\addto\captionsspanish{%
+  \renewcommand{\figurename}{Figura~}
+}
+
+\renewcommand{\UrlFont}{\rmfamily}
+\newcommand{\bhline}{\noalign{\hrule height 0.8pt}} 
+
+\RequirePackage{comment}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\gdef\@title{Análisis de los hábitos de las personas y sus niveles de presión arterial mediante algoritmos de aprendizaje supervisado y no supervisado}
+\makeatother
+
+\author{Leonardo Garcia Muñoz}
+\makeatletter
+\renewcommand{\@maketitle}{%
+  \begin{center}%
+    {\Large\bfseries \@title \par}%
+    \vskip 1em%
+    {\normalsize \@author \par}%
+    \vskip 1em%
+    {\normalsize \@date \par}% ← aquí forzamos que aparezca la fecha
+  \end{center}%
+  \vskip 1em
+}
+\makeatother
+
+\makeatletter
+\renewcommand{\@seccntformat}[1]{\csname the#1\endcsname\quad}
+\makeatother
+
+\makeatletter
+% Desactiva el texto de copyright de The Japan Society for Aeronautical and Space Sciences
+\def\ps@titlepage{}%
+\def\@thanks{}%
+\def\@makefntext#1{}%
+\def\@thefnmark{}%
+
+% Sobrescribe cualquier intento de colocar pies de página o copyright
+\def\footnoterule{}%
+\def\@oddfoot{}%
+\def\@evenfoot{}%
+
+% Anula comandos internos de tjsass que añaden © y "Corresponding author"
+\def\footertext#1{}%
+\def\copyrightholder#1{}%
+\def\@footnotetext#1{}%
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+
+Los hábitos con los que cuentan las personas en los tiempos actuales son considerados una de las principales razones de las enfermedades que actualmente presentan una alta incidencia, siendo estos factores mucho más relevantes en un monitoreo médico que incluso la predisposición genética de las personas. Existen distintas maneras de clasificar los distintos hábitos con los que cuentan las personas.
+
+Mientras que el estresante estilo de vida con el que se cuenta hoy en día juega un papel muy importante en nuestra salud, pues el estrés se refleja de distintas maneras.
+Una de estas es mediante la presión arterial, un medidor de nuestra salud cardiovascular. Mucha gente puede llamarle el asesino silencioso, debido a que en muchas personas no se detectan niveles de presión arterial elevados hasta que estos ya comienzan a tener consecuencias en el cuerpo, como daño renal, mental o problemas cardiacos.
+
+Pero muchas veces estos niveles altos en la presión arterial son derivados de mucho tiempo descuidando la calidad de vida, bajo malos hábitos y malas decisiones, que silenciosamente juegan en contra del cuerpo humano.
+
+El siguiente artículo tiene como principal propósito aplicar técnicas de \textbf{Aprendizaje supervisado} y \textbf{no supervisado} para explorar distintas agrupaciones y modelos que se alimenten de los hábitos de las personas para poder analizar las relaciones existentes con los riesgos que tienen las personas de sufrir hipertensión, de manera que pueda existir una manera óptima de obtener, mediante los hábitos de las personas, una predicción sobre el estado de su salud cardiovascular, mas exactamente sobre el nivel de la presión diastólica, un indicador muy importante al obtener el nivel de la presión arterial.
+
+\section{Descripción de los datos}
+El conjunto de datos se compone por las siguientes variables númericas:
+\begin{itemize}
+  \item Edad, IMC, Pasos diarios, Horas de sueño, Consumo de agua, Calorias consumidas promedio, Horas de descanso sin estrés, Presión sistólica, Presión diastólica y colesterol
+\end{itemize}
+
+Tambien presenta las siguientes variables categoricas:
+\begin{itemize}
+  \item Genero, Fumador, Consumo de Alcohol, Historial familiar de enfermedades.
+\end{itemize}
+
+Todas estas variables fueron registradas por persona, por lo cual cada registro de estas variables es una persona con distintos hábitos, condiciones de vida e historias diferentes. Pero esta información, para poder ser utilizada en los algoritmos a aplicar, se estandarizó para evitar problemas de escalabilidad entre variables y presentarlas todas en las mismas dimensiones.
+
+Realizando el siguiente mapa de calor para analizar de manera mas visual la correlacion entre las variables anteriormente mencionadas.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{T6/grafico17.png}
+    \caption{Mapa de calor generado en Python}
+    \label{fig:grafico}
+\end{figure}
+
+\section{Metodología}
+\subsection{Algoritmo \emph{K-Means}}
+
+Este algoritmo de \textbf{clustering} o agrupamiento agrupa los datos en $k$ grupos o \textbf{clusters} basandose en la distancia al punto promedio o \textbf{centroide} que representa el centro de un grupo, y a cada dato se le asigna el \textbf{centroide} mas cercano. Para despues recalcular los \textbf{centroide} de manera iterativa. Buscando que los datos que componen cada grupo sean similares.
+
+
+Formalmente, la distancia más cercana respecto a los centroides se define como la minimizacion del error cuadrado para cada grupo.
+
+\[
+SS_k = \sum_{i \in K} (x_i - \hat{x}_k)^2 + (y_i - \hat{y}_k)^2.
+\]
+
+Teniendo como función objetivo
+\[
+\min \sum_{i \in K} SS_k.
+\]
+Donde $\hat{c}_k$ es un centroide compuesto por ($\hat{x}$, $\hat{y}$)
+\subsection{Algoritmo \emph{Optics}}
+El algoritmo \emph{Ordering Points To Identify the Clustering Structure} o \emph{OPTICS} esta en la identificacion de regiones con una alta densidad de datos. Cada dato o punto tiene una densidad que se calcula como el valor maximo entre la distancia al dato vecino mas cercano y un parámetro de densidad minimo.
+El algoritmo recorre los datos, expandiendo los clusters desde los puntos más densos y ordenandolos de manera que refleja la estructura de densidades.
+
+Formalmente se define de la siguiente manera
+\[
+reachability\_distance(p,o) = max(core\_distance(o),dist(p,o))
+\]
+Donde $core\_distance(o)$ es el parametro de densidad minimo.
+
+\subsection{Metrica \emph{Inercia}}
+Esta métrica que se puede utilizar en \emph{K-Means} mide que tan compactos están los clusters, calculando la suma de las distancias al cuadrado de cada punto a su centroide. Para elegir el número óptimo de clusters, se prueba K-Means con varios $k$ y se grafica la inercia contra $k$. Mediante el método del codo se busca el punto de quiebre, en donde la disminución de la inercia se vuelve menos pronunciada en escala de valores.
+
+Formalmente para $k$ clusters o grupos
+
+\[
+Inercia = \sum_{i=1}^{k} \sum_{x_j \in C_i} \| x_j - \mu_i \|^2
+\]
+
+Donde $C_i$ son los puntos que componen el grupo o cluster $i$ y $\mu_i$ su centroide.
+\subsection{Metrica \emph{Calinski-Harabasz}}
+
+El índice \emph{Calinski-Harabasz} es una métrica para evaluar clusters o grupos que compara la separación entre grupos con que tan cerca estan los puntos entre si, dentro de cada grupo. Se usa para elegir el número óptimo de clusters $k$. Calculando CH para varios $k$, el valor más alto indica la mejor separación y cohesión.
+
+Formalmente para $k$ clusters o grupos.
+\[
+CH = \frac{B_k / (k - 1)}{W_k / (n - k)}
+\]
+
+Donde $B_k$ es la varianza entre clusters, $W_k$ la varianza dentro de los clusters, $n$ el número de puntos y $k$ el numero de clusters o grupos. Un CH alto indica grupos altos y bien separados de otros.
+
+
+
+\subsection{Modelo de \emph{Regresión Lineal}}
+
+El modelo de Regresión Lineal busca describir la relación entre una variable dependiente $y$ y un conjunto de variables independientes $x_1,x_2,...,x_n$.
+Su objetivo es encontrar los coeficientes de $\beta_i$ que minimicen el error cuadrático entre los valores observados y los valores predichos.
+
+Formalmente, el modelo se define de la siguiente manera.
+\[y_i = \beta_0 + \beta_1  x_1+ \beta_2 x_2+ ... + \beta_n x_n\]
+
+\subsection{Modelo \emph{Lasso} (Least Absolute Shrinkage and Selection Operator}
+
+El modelo de Lasso es una extensión de la regresión lineal que introduce una penalización sobre el tamaño de los coeficientes del modelo para controlar la complejidad y evitar un sobreajuste. 
+
+Formalmente, la funcion de penalizacion que utiliza se define de la siguiente manera.
+
+\begin{equation}
+\min_{\boldsymbol{\beta}} \left( \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j| \right)
+\end{equation}
+
+Donde $y_i$ es el valor observado de la variable dependiente ($y$), $\hat{y}_i$ es el valor estimado por el modelo, $\beta_j$ es el coeficiente que toma el modelo y $\lambda$ es el parámetro de penalización.
+
+\subsection{Algoritmo \emph{Random Forest}}
+
+El algoritmo Random Forest es un método de aprendizaje supervisado que combina múltiples árboles de decisión para mejorar la precisión del modelo y reducir asi el sobreajuste.
+Cada uno de los árboles que componen el algoritmo se entrena con muestras aleatorias de datos y de las variables predictoras ($x$) generando asi una serie de modelos diferentes (árboles de decisiones diferentes entre si).
+
+Formalmente, si existen $n$ árboles individuales y cada uno produce una predicción $\hat{y}_t$ el algoritmo se define de la siguiente manera.
+
+\begin{equation}
+\hat{y} = \frac{1}{n} \sum_{t=1}^{n} \hat{y}_t
+\end{equation}
+
+Donde $\hat{y}$ es el valor pronosticado del modelo Random Forest, $n$ es el número total de árboles de decision que componen el bosque, $\hat{y}_t$ es la predicción realizada por el árbol $t$-ésimo.
+
+
+\subsection{Métrica \emph{MAE} (Mean Absolute Error)}
+
+El Error Absoluto Medio (MAE) es una métrica utilizada para evaluar el desempeño de los modelos de Regresión.
+Mide la diferencia promedio entre los valores reales y los valores predichos por el modelo. Esta métrica es la que se utilizara para medir el desempeño de los modelos a utilizar.
+
+Formalmente, se define como:
+
+\begin{equation}
+MAE = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+\end{equation}
+
+Donde $n$ es el número total de observaciones, $y_i$ representa el valor real observado, $\hat{y}_i$ es el valor estimado por el modelo a evaluar.
+
+\section{Diseño del Experimento}
+Para evaluar el desempeño de los modelos de regresión empleados, se diseño un procedimiento experimental que asegura que este mismo sea replicable ó reproducible. Ademas de contar con una comparación objetiva entre algoritmos.
+
+Utilizando el siguiente flujo experimental:
+
+\begin{enumerate}
+    \item Estandarización de las variables
+    \item División de la informacion en subconjuntos: 70\% para entrenamiento y 30\% para prueba.
+    \item Entrenamiento del modelo con el subconjunto de entrenamiento
+    \item Evaluación del modelo con los datos de prueba
+     \item Comparación de la métrica de error entre modelos
+\end{enumerate}
+De tal manera que se garantiza una estimación clara del error del modelo para poder comparar el desempeño del mismo con otros, bajo las mismas condiciones experimentales.
+
+
+\textbf{¿Porque esta diseñado de esa manera el experimento?}.
+
+Recordemos que bajo este diseño se busca encontrar el mejor modelo que pueda encontrar la mejor relacion entre hábitos de las personas, y sus niveles de presion arterial. Principalmente la presion diastólica, y es una de las razones por las que se cuida la replicabilidad del experimento, para que se pueda tambien replicar la calibracion y evaluacion del mejor modelo.
+
+\section{Resultados}
+Primero realizando la tecnica de \emph{k-Means} y utilizando la metrica \emph{Inercia} obtenemos los siguientes resultados:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{grafico1.png}
+    \caption{Gráfico generado en Python mediante la metrica \emph{Inercia}.}
+    \label{fig:grafico}
+\end{figure}
+
+Para obtener el numero de $k$ grupos a utilizar primero debemos aplicar el Método del codo.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{grafico2.png}
+    \caption{Gráfico generado en Python para aplicar el Método del codo.}
+    \label{fig:grafico}
+\end{figure}
+
+Se aprecia como el punto de quiebre ocurre en $k=5$ debido a que apartir de ahi, la disminucion ya no es tan pronunciada.
+
+Por lo tanto se utiliza $k=5$ para \emph{K-Means}. 
+
+\vspace{\baselineskip}
+Ahora, utilizando la metrica \emph{Calinski-Harabasz}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{grafico3.png}
+    \caption{Gráfico generado en Python mediante la metrica \emph{Calinski-Harabasz}.}
+    \label{fig:grafico}
+\end{figure}
+
+
+Obtenemos que el CH mas alto pertenece a $k=3$, por lo que bajo esta metrica tendrian que utilizarse 3 clusters.
+\vspace{\baselineskip}
+
+Pero tambien aplicaremos al algoritmo \emph{OPTICS} el cual obtiene los clusters necesarios sin necesidad de obtenerlos mediante algun otro metodo
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{grafico4.png}
+    \caption{Gráfico generado en Python mediante \emph{OPTICS}.}
+    \label{fig:grafico}
+\end{figure}
+
+Donde el cluster denominado como \textbf{-1} pertenece a los outliers.
+Mientras que el resto de los clusters, asi como el numero de los mismos fueron definidos por el algoritmo
+
+\vspace{\baselineskip}
+Revisando los siguientes clusters obtenidos mediante \emph{K-Means} bajo el numero de $k$ grupos obtenido mediante el Método del codo: 
+\begin{enumerate}
+     \item \textbf{Cluster 0}: Personas con niveles medios de actividad física, calidad del sueño y consumo de calorías, ademas de consumo de alcohol y tabaco en niveles muy bajos, pero niveles intermedios de presión sistólica.
+    \item \textbf{Cluster 1}: Personas en su mayoria hombres, con un consumo alto de alcohol, consumo promedio de tabaco, actividad física baja, un historial familiar de enfermedades con una frecuencia baja de aparicion de enfermedades graves o mortales y con una presión sistólica en niveles normales
+    \item \textbf{Cluster 2}: Personas en su mayoria mujeres, con un consumo bajo de alcohol, poco o nulo consumo de tabaco, poca actividad física, un consumo de calorías promedio y con historial familiar con una frecuencia baja de aparicion de enfermedades.
+    \item \textbf{Cluster 3}: Personas en su mayoria hombres, con un consumo alto de alcohol, niveles de colesterol regulares y con actividad física en niveles normales
+    \item \textbf{Cluster 4}: Personas con un historial familiar con una alta frecuencia de aparicion de enfermedades graves, actividad física baja, poco consumo de alcohol, pero con niveles de colesterol y presión sistólica un poco elevados.
+\end{enumerate}
+
+Estos clusters se pueden resumir en caracteristicas mas generales, de la siguiente manera:
+
+
+\begin{table}[H]
+\centering
+\resizebox{0.5\textwidth}{!}{
+\begin{tabular}{c l}
+\hline
+\textbf{Cluster} & \textbf{Perfil} \\
+\hline
+0 & Salud general promedio, sin riesgos o hábitos peligrosos. \\
+1 & Alto consumo de alcohol, con riesgo por hábitos. \\
+2 & Muy sedentario, bajo consumo de alcohol y tabaco. \\
+3 & Alto consumo de alcohol, hábitos más equilibrados. \\
+4 & Personas con riesgo genético. \\
+\hline
+\end{tabular}
+}
+\caption{Perfiles encontrados en los clusters de K-Means.}
+\end{table}
+
+Ahora, calibrando un modelo de regresion lineal para realizar predicciones sobre la variable de  \emph{Presión Arterial diastólica} obtenemos los siguientes resultados reflejados en el grafico.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{T6/grafico9.png}
+    \caption{Gráfico generado en Python con base a una Regresion Lineal.}
+    \label{fig:grafico}
+\end{figure}
+Se observa como los valores pronosticados oscilan entre el 0.4 y el 0.6 mientras que los valores observados se encuentran en un intervalo mucho mas amplio de valores, lo cual nos podria hablar de un posible sobreajuste en el modelo. Ademas de que muy pocos valores realmente se ajustan a la \emph{Línea ideal}
+
+En la siguiente figura se estan comparando distintos algoritmos supervisados para evaluar su desempeño y elegir el mejor modelo a utilizar, adicionalmente del modelo de regresion lineal previamente calibrado.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{grafico6.png}
+    \caption{Gráfico de violín generado en Python}
+    \label{fig:grafico}
+\end{figure}
+
+El modelo con menor error (MAE) y el tiempo de ejecucion mas optimo es el modelo Lasso, por lo que se calibra un modelo Lasso con el cual se pueda predecir la  \emph{Presión Arterial diastólica}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{grafico7.png}
+    \caption{Gráfico generado en Python en base a un modelo Lasso.}
+    \label{fig:grafico}
+\end{figure}
+
+En este modelo obtenemos una mayor variacion en las predicciones que realiza el modelo, pero sigue existiendo una concentracion de los valores pronosticados justo en el rango de \textbf{(0.38 , 0.6]}. Ademas de contar con una menor cantidad de valores que sigan la \emph{Línea ideal}.
+
+\vspace{\baselineskip}
+Ahora, aplicando y calibrando el algoritmo de aprendizaje supervisado \emph{Random Forest} obtenemos los siguientes resultados.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{T6/grafico8.png}
+    \caption{Gráfico generado en Python en base a un Random Forest.}
+    \label{fig:grafico}
+\end{figure}
+
+Comparandolo con los otros dos modelos previamente calibrados, observamos como este es el que presenta la mayor variabilidad en las predicciones que realiza, pues ahora estas cubren un rango mayor de valores. Tomando los valores \textbf{(0.35 , 0.66)}. Resaltando que aun y con mayor variacion, existen menos puntos que se ajusten a la \emph{Línea ideal}.
+\vspace{\baselineskip}
+
+Con todos los modelos calibrados y utilizados para pronosticar, podemos realizar la comparacion de la metrica para medir los errores de los datos.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lc}
+\hline
+\textbf{Modelo} & \textbf{MAE} \\
+\hline
+Regresion Lineal & \textbf{0.2646}  \\
+Regresion Lasso & \textbf{0.2605}  \\
+Random Forest & \textbf{0.2666}  \\
+\hline
+\end{tabular}
+\caption{Comparación de los modelos según la métricas de error.}
+\label{tab:modelos}
+\end{table}
+Para ambos modelos se dividio el conjunto de datos de entrenamiento y prueba en una proporcion del 70\% y del 30\% respectivamente.
+
+\vspace{\baselineskip}
+Adicionalmente de la métrica \emph{MAE} tambien se realizo la siguiente comparativa por modelo de la distancia que existe entre los pronosticos que realizan los modelos y los valores reales observados, para medir que tanto error existe en las predicciones de una manera mas visual.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{T6/grafico14.png}
+    \caption{Gráfico generado en Python en base a un Histograma.}
+    \label{fig:grafico}
+\end{figure}
+
+Este Histograma del error en el Modelo de Regresión Lineal nos muestra que las diferencias se concentran principalmente en 3 puntos distintos, pero uno de ellos es muy cercano al 0.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{T6/grafico15.png}
+    \caption{Gráfico generado en Python en base a un Histograma.}
+    \label{fig:grafico}
+\end{figure}
+
+Mientras que por su parte, este Histograma del error en el Modelo Lasso nos muestra que las diferencias se concentran de una manera muy parecida al Modelo Lineal, lo cual podria ser esperable.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{T6/grafico16.png}
+    \caption{Gráfico generado en Python en base a un Histograma.}
+    \label{fig:grafico}
+\end{figure}
+
+Adicionalmente, el Histograma del error en el Modelo Random Forest nos muestra una mayor concentracion en el centro, en valores principalmente cercanos al 0 absoluto.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{T6/grafico13.png}D
+    \caption{Gráfico generado en Python en base a un Histograma.}
+    \label{fig:grafico}
+\end{figure}
+
+Comparandolos en un mismo grafico, obtenemos un Histograma del error en los tres Modelos Calibrados, observando las tres distintas maneras en que se distribuye el error.
+
+\section{Conclusiones y discusiones}
+\subsection{Algoritmos No Supervisados para clustering}
+Principalmente podemos concluir que el algoritmo \emph{OPTICS} genera 6 clusters distintos, mientras que \emph{Calinski-Harabasz} nos dio 3 y en \emph{K-Means} utilizamos 5. Pero sin importar el algoritmo vemos que los clusters presentan valores muy parecidos entre ellos, aunque se pueden apreciar algunos comportamientos notorios que difieren de un cluster a otro.
+
+El que mejor agrupa es el presentado, \emph{K-Means} con 5 clusters distintos, pues separa ciertos comportamientos de otros de una mejor manera. Pues se abarcan distintos tipos de riesgos, aquellos que son solo geneticos, otros que son relacionados con el sedentarismo, el consumo de alcohol, niveles de colesterol.
+
+Concluyendo con que K-Means es un algoritmo muy eficiente bajo la metrica de Inercia para generar grupos en la información, mientras que OPTICS va un paso adelante pues generó un numero mas alto de grupos, pero no todo lo que brilla es oro. Pues el hecho de tener mas agrupaciones no siempre es lo mas eficiente y K-Means lo demuestra, con sus agrupaciones da unas buenas descripciones del comportamiento de la informacion.
+
+\vspace{\baselineskip}
+\subsection{Algoritmos Supervisados para Pronosticos}
+Concluimos con los resultados obtenidos que en el modelo Lasso las predicciones estan mas dispersas, tienen un rango un poco mas amplio que el que presenta el modelo de Regresión lineal, pero en ambos muy pocos puntos siguen la diagonal o \emph{Línea ideal} aunque el modelo de Regresión al presentar una menor variabilidad, se podria inferir que mas puntos de los pronosticados se encuentran siguiendo esta diagonal, en proporciones generales ambos modelos tienen un numero muy reducido de puntos que la siguen.
+
+Tambien, con base al algoritmo de Random Forest aplicado, las predicciones si pueden presentar una mayor variacion en valores pronosticados, pero tambien presenta una mayor incidencia de \textbf{outliers} que se pueden detectar a primera vista en el grafico.
+
+Adicionalmente, mediante la metrica de MAE obtenemos que el modelo Lasso esta ligeramente más cerca de los valores reales que el modelo de Regresion Lineal, aunque es una mejora en el rendimiento muy pequeña, sigue siendo mejor, pero tomando en cuenta tambien que el modelo Lasso presenta una mayor variacion en las predicciones, lo cual imita un poco mejor el comportamiento real de la presión diastólica, resaltando que el Random Forest calibrado presenta un mayor error, en comparacion a los otros modelos utilizados, lo cual explicaria el porque existe una mayor variabilidad en los pronosticos y por ende una mayor incidencia en los \textbf{outliers}.
+
+Considerando tambien los histogramas donde se refleja de manera directa como se agrupan las diferencias entre el valor real y las predicciones que realizan los modelos, de primera instancia es muy notorio que el modelo Lineal y el modelo Lasso tienen comportamientos muy iguales, se distribuyen de maneras casi identicas, pero si cuentan con diferencias, aunque muy reducidas.
+Mostrando un gran contraste cuando se comparan ambos modelos con el Random Forest, pues este presenta muchos mas valores que rondan el 0, siendo mucho menor la diferencia en una mayor cantidad de registros, mientras que los errores mas grandes cuentan con menores frecuencias que los modelos Lineal y Lasso.
+
+Por lo que, El modelo Lasso presenta un desempeño mejor que el modelo de Regresión lineal y el Random Forest, pero este ultimo es el que presenta una menor cantidad de diferencias respecto a los datos reales, obteniendo asi al Modelo Random Forest, como aquel con las mejores predicciones.
+\vspace{\baselineskip}
+
+\bibliographystyle{abbrvnat}
+\bibliography{biblio}
+
+\vspace{\baselineskip}
+Fernández, D., Pezzi, J. P., \& Caruso, G. (s. f.). \textit{Apnea del sueño e hipertensión arterial. Diagnóstico y terapéutica.}\url{https://www.saha.org.ar/uploads/pdf/Cap.%2E096.pdf}
+
+\vspace{\baselineskip}
+Adugna, D. G., Desta, D. T., \& Molla, M. M. (2024). \textit{Predicting high blood pressure using machine learning models in low- and middle-income countries}. 
+\url{https://www.researchgate.net/publication/383346119_Predicting_high_blood_pressure_using_machine_learning_models_in_low-_and_middle-income_countries}
+
+\vspace{\baselineskip}
+Tsoi, K. K. F., Chan, N. B., Yiu, K. K. L., Poon, S. K. S., Lin, B., \& Ho, K. (2020). \textit{Machine learning clustering for blood pressure variability applied to systolic blood pressure intervention trial (SPRINT) and the Hong Kong community cohort}. 
+\textit{Hypertension}. 
+\url{https://pubmed.ncbi.nlm.nih.gov/32594794/}
+
+\vspace{\baselineskip}
+Mayo Clinic. (2025, marzo 07). \textit{ ¿La falta de sueño puede provocar presión arterial alta? } 
+\url{https://www.mayoclinic.org/es/diseases-conditions/high-blood-pressure/expert-answers/sleep-deprivation/faq-20057959}
+
+\vspace{\baselineskip}
+Filippi, A., … (2024). \textit{Smoking cessation decreases arterial blood pressure in hypertensive smokers: A subgroup analysis of the randomized controlled trial GENTSMOKING.} \url{https://pubmed.ncbi.nlm.nih.gov/38756738/}
+
+\vspace{\baselineskip}
+Benavides, Alberto. (2025). Aprendizaje Automático.  
+Repositorio en GitHub: \url{https://github.com/albertobenavides/aprendizaje_autom/tree/master}
+
+\vspace{\baselineskip}
+Scikit-learn. (s. f.). \textit{Lasso — scikit-learn 1.5.2 documentation.} 
+\url{https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html}
+
+\vspace{\baselineskip}
+Cappuccio, F. P., … (2023). \textit{Examining Daily Associations Among Sleep, Stress, and Blood Pressure Across Adulthood.} \url{https://pubmed.ncbi.nlm.nih.gov/36680526/}
+\vspace{\baselineskip}
+
+
+\end{document}
+
